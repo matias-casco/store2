@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
-import { Product, CreateProductDto } from '../../models/product.model';
+import { Product, CreateProductDto, UpdateProductDto } from '../../models/product.model';
 
 import { StoreService } from '../../services/store.service';
 import { ProductsService } from '../../services/products.service';
@@ -27,6 +27,8 @@ export class ProductsComponent implements OnInit {
     },
     description: ''
   };
+  limit = 10;
+  offset = 0;
 
   constructor(
     private storeService: StoreService,
@@ -36,10 +38,7 @@ export class ProductsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.productsService.getAllProducts()
-    .subscribe(data => {
-      this.products = data;
-    });
+    this.loadData()
   }
 
   onAddToShoppingCart(product: Product) {
@@ -72,5 +71,36 @@ export class ProductsComponent implements OnInit {
     .subscribe(data => {
       this.products.unshift(data);
     })
+  }
+
+  updateProduct() {
+    const changes: UpdateProductDto = {
+      title: 'Título cambiado'
+    }
+    const id = this.productChosen.id;
+    this.productsService.update(id, changes)
+    .subscribe(data => {
+      const productIndex = this.products.findIndex(item => item.id === this.productChosen.id);
+      this.products[productIndex] = data;
+      this.productChosen = data;
+    });
+  }
+
+  deleteProduct() {
+    const id = this.productChosen.id;
+    this.productsService.delete(id)
+    .subscribe(() => {
+      const productIndex = this.products.findIndex(item => item.id === this.productChosen.id);
+      this.products.splice(productIndex, 1);
+      this.showProductDetail = false;
+    })
+  }
+
+  loadData(){
+    this.productsService.getAllProducts(this.limit, this.offset)
+    .subscribe(data => {
+      this.products = this.products.concat(data);
+      this.offset += this.limit;
+    });
   }
 }
