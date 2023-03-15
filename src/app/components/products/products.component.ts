@@ -13,6 +13,11 @@ import { ProductsService } from '../../services/products.service';
 export class ProductsComponent {
 
   @Input() products: Product[] = [];
+  @Input() set productId(id: string | null) {
+    if (id) {
+      this.onShowDetails(id)
+    }
+  }
   @Output() loadMore = new EventEmitter;
 
   myShoppingCart: Product[] = [];
@@ -47,9 +52,11 @@ export class ProductsComponent {
   }
 
   onShowDetails(id: string) {
+    if (!this.showProductDetail) {
+      this.showProductDetail = true;
+    }
     this.productsService.getProduct(id)
     .subscribe(data => {
-      this.toggleProductDetail();
       this.productChosen = data;
     })
   }

@@ -7,25 +7,26 @@ import { Product } from 'src/app/models/product.model';
 
 @Component({
   selector: 'app-category',
-  template: `<app-products [products]="products" (loadMore)="onLoadMore()"></app-products>`,
+  template: `<app-products [productId]="productId" [products]="products" (loadMore)="onLoadMore()"></app-products>`,
   styleUrls: ['./category.component.scss']
 })
 export class CategoryComponent implements OnInit {
 
+  productId: string | null = null;
   categoryId: string | null = null;
   limit = 10;
   offset = 0;
   products: Product[] = [];
 
   constructor(
-    private route: ActivatedRoute,
+    private activatedRoute: ActivatedRoute,
     private productsService: ProductsService
   ) {
 
   }
 
   ngOnInit(): void {
-    this.route.paramMap
+    this.activatedRoute.paramMap
     .pipe(
       switchMap(params => {
         this.categoryId = params.get('id');
@@ -38,6 +39,9 @@ export class CategoryComponent implements OnInit {
    .subscribe(data => {
       this.products = data;
     });
+    this.activatedRoute.queryParamMap.subscribe(params => {
+      this.productId = params.get('product');
+    })
   }
 
   onLoadMore(){
