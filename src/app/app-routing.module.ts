@@ -45,7 +45,7 @@ const routes: Routes = [
     component: MyCartComponent
   },
   {
-    path:'not-found',
+    path:'**',
     component: NotFoundComponent
   }
 ];
