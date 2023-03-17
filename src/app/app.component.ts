@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 import { AuthService } from './services/auth.service';
+import { TokenService } from './services/token.service';
 import { UsersService } from './services/users.service';
 import { Auth } from './models/auth.model';
 import { FilesService } from './services/files.service';
@@ -10,7 +11,7 @@ import { FilesService } from './services/files.service';
   template: `<router-outlet></router-outlet>`,
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
 
   token = '';
   imgRta = '';
@@ -18,15 +19,24 @@ export class AppComponent {
   constructor(
     private authService: AuthService,
     private usersService: UsersService,
-    private fileService: FilesService
-  ) {
+    private fileService: FilesService,
+    private tokenService: TokenService
+  ) { }
 
+  ngOnInit(): void {
+    const token = this.tokenService.getToken();
+    if(token) {
+      this.authService.profile()
+      .subscribe()
+    }
   }
+
   createUser() {
     this.usersService.create({
-      name: 'Sebas',
-      email: 'sebas@mail.com',
-      password: '1212'
+      name: 'Jhon',
+      email: 'john@mail.com',
+      password: 'changeme',
+      role: 'customer'
     })
     .subscribe(rta => {
       console.log(rta)
@@ -34,7 +44,7 @@ export class AppComponent {
   }
 
   login() {
-    this.authService.login('sebas@mail.com','1212'
+    this.authService.login('john@mail.com','changeme'
     )
     .subscribe((rta: Auth) => {
       this.token = rta.access_token;
